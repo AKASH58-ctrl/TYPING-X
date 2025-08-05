@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TPINY X - Improve Your English Typing</title>
+    <link href="https://fonts.googleapis.com/css2?family=General+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'General Sans', sans-serif;
+        }
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        /* Navigation Bar */
+        .navbar {
+            background-color: #ADD8E6;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #001f3f;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        .logo i {
+            margin-right: 10px;
+            color: #0074D9;
+        }
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        .nav-links li {
+            margin-left: 2rem;
+        }
+        .nav-links a {
+            color: #001f3f;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        .nav-links a:hover {
+            color: #0074D9;
+            text-decoration: underline;
+        }
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #001f3f 0%, #0074D9 100%);
+            color: white;
+            text-align: center;
+            padding: 5rem 2rem;
+        }
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+        .cta-button {
+            background-color: #FF851B;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 133, 27, 0.3);
+        }
+        .cta-button:hover {
+            background-color: #FF6B00;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 133, 27, 0.4);
+        }
+        /* Features Section */
+        .features {
+            padding: 5rem 5%;
+            background-color: white;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #001f3f;
+            margin-bottom: 3rem;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .feature-card {
+            background-color: #f0f8ff;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        .feature-card i {
+            font-size: 3rem;
+            color: #0074D9;
+            margin-bottom: 1.5rem;
+        }
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #001f3f;
+        }
+        /* Added cursor pointer for clickable feature cards */
+        .feature-card.clickable {
+            cursor: pointer;
+        }
+        .feature-card.clickable:hover {
+            background-color: #e6f2ff;
+        }
+        /* Typing Game Section */
+        .typing-game {
+            padding: 5rem 5%;
+            background-color: #f8f9fa;
+        }
+        .game-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .timer, .wpm, .accuracy {
+            background-color: #001f3f;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+        .text-display {
+            background-color: #f0f8ff;
+            padding: 1.5rem;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            min-height: 150px;
+        }
+        .typing-input {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.2rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 1.5rem;
+            transition: border-color 0.3s;
+        }
+        .typing-input:focus {
+            outline: none;
+            border-color: #0074D9;
+        }
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .game-button {
+            padding: 10px 25px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .start-button {
+            background-color: #2ECC40;
+            color: white;
+        }
+        .start-button:hover {
+            background-color: #27AE60;
+        }
+        .reset-button {
+            background-color: #FF4136;
+            color: white;
+        }
+        .reset-button:hover {
+            background-color: #FF851B;
+        }
+        .progress-button {
+            background-color: #0074D9;
+            color: white;
+        }
+        .progress-button:hover {
+            background-color: #0056b3;
+        }
+        .time-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+        .time-selector label {
+            font-weight: 600;
+            color: #001f3f;
+        }
+        .time-selector select {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: white;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .time-selector select:focus {
+            outline: none;
+            border-color: #0074D9;
+        }
+        /* Progress Section */
+        .progress-section {
+            padding: 5rem 5%;
+            background-color: white;
+        }
+        .progress-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        .stat-card {
+            background-color: #f0f8ff;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+        .stat-card h3 {
+            color: #0074D9;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .stat-card p {
+            color: #001f3f;
+            font-weight: 600;
+        }
+        .chart-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+        .history-table th, .history-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .history-table th {
+            background-color: #001f3f;
+            color: white;
+        }
+        .history-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .history-table tr:hover {
+            background-color: #e6f7ff;
+        }
+        /* Footer */
+        .footer {
+            background-color: #001f3f;
+            color: white;
+            padding: 3rem 5%;
+        }
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        .footer-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: #0074D9;
+        }
+        .contact-info p {
+            margin-bottom: 0.5rem;
+        }
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: #0074D9;
+            color: white;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        .social-links a:hover {
+            background-color: #FF851B;
+            transform: translateY(-3px);
+        }
+        .copyright {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        /* Popup */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .popup-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+        }
+        .close-popup {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+        }
+        .popup h2 {
+            color: #001f3f;
+            margin-bottom: 1rem;
+        }
+        .popup p {
+            margin-bottom: 1.5rem;
+        }
+        .popup-button {
+            background-color: #0074D9;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .popup-button:hover {
+            background-color: #0056b3;
+        }
+        /* Progress Modal */
+        .progress-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        .progress-modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 1000px;
+            position: relative;
+        }
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #777;
+        }
+        .close-modal:hover {
+            color: #333;
+        }
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                margin-top: 1rem;
+            }
+            
+            .nav-links li {
+                margin-left: 1rem;
+                margin-right: 1rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .game-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .game-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .time-selector {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="#" class="logo">
+            <i class="fas fa-keyboard"></i>
+            TPINY X
+        </a>
+        <ul class="nav-links">
+            <li><a href="#" class="active">Home</a></li>
+            <li><a href="#" id="progressLink">Progress</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul>
+    </nav>
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Improve Your English Typing Skills</h1>
+        <p>Practice typing with fun games and exercises. Track your progress and become a typing master!</p>
+        <button class="cta-button" id="startTypingBtn">Start Typing Now</button>
+    </section>
+    <!-- Features Section -->
+    <section class="features">
+        <h2 class="section-title">Why Choose TPINY X?</h2>
+        <div class="features-grid">
+<a href="game.html" target="_blank" class="feature-card" style="text-decoration: none; color: inherit;">
+    <i class="fas fa-gamepad"></i>
+    <h3>Typing Games</h3>
+    <p>Engaging games that make learning to type enjoyable and effective.</p>
+</a>
+<div class="feature-card clickable" id="trackProgressCard">
+    <i class="fas fa-chart-line"></i>
+    <h3>Track Progress</h3>
+    <p>Monitor your WPM, accuracy, and improvement over time with detailed statistics.</p>
+</div>
+<a href="https://www.google.com" target="_blank" class="feature-card" style="text-decoration: none; color: inherit;">
+    <i class="fas fa-book"></i>
+    <h3>English Practice</h3>
+    <p>Improve your English vocabulary while enhancing your typing skills.</p>
+</a>
+        </div>
+    </section>
+    <!-- Typing Game Section -->
+    <section class="typing-game">
+        <h2 class="section-title">Typing Practice</h2>
+        <div class="game-container">
+            <div class="game-header">
+                <div class="timer">Time: <span id="time">60</span>s</div>
+                <div class="wpm">WPM: <span id="wpm">0</span></div>
+                <div class="accuracy">Accuracy: <span id="accuracy">0</span>%</div>
+            </div>
+            <div class="text-display" id="textDisplay">
+                The quick brown fox jumps over the lazy dog. Programming is the process of creating a set of instructions that tell a computer how to perform a task. Programming can be done using a variety of computer programming languages.
+            </div>
+            <div class="time-selector">
+                <label for="timeOption">Test Duration:</label>
+                <select id="timeOption">
+                    <option value="60" selected>1 minutes</option>
+                    <option value="300">5 minutes</option>
+                    <option value="600">10 minutes</option>
+                    <option value="900">15 minutes</option>
+                    
+                </select>
+            </div>
+            <textarea class="typing-input" id="typingInput" placeholder="Start typing here..." disabled></textarea>
+            <div class="game-controls">
+                <button class="game-button start-button" id="startButton">Start Game</button>
+                <button class="game-button reset-button" id="resetButton">Reset</button>
+                <button class="game-button progress-button" id="viewProgressBtn">View Progress</button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Progress Section -->
+    <section class="progress-section" id="progressSection" style="display: none;">
+        <div class="progress-container">
+            <h2 class="section-title">Your Typing Progress</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="avgWpm">0</h3>
+                    <p>Average WPM</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="bestWpm">0</h3>
+                    <p>Best WPM</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="avgAccuracy">0%</h3>
+                    <p>Average Accuracy</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalTests">0</h3>
+                    <p>Tests Completed</p>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="progressChart"></canvas>
+            </div>
+            
+            <h3 style="margin-bottom: 1rem; color: #001f3f;">Test History</h3>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Duration</th>
+                        <th>WPM</th>
+                        <th>Accuracy</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTableBody">
+                    <!-- History rows will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About TPINY X</h3>
+                <p>TPINY X is dedicated to helping people improve their typing skills through fun and engaging games and exercises.</p>
+            </div>
+            <div class="footer-section contact-info">
+                <h3>Contact Us</h3>
+                <p><i class="fas fa-envelope"></i> ak83650494771@gmail.com</p>
+                <p><i class="fas fa-phone"></i> +91 (indian)- 0000000000 </p>
+                <p><i class="fas fa-map-marker-alt"></i> 9142 Typing Street, Keyboard City</p>
+            </div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2023 TPINY X. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <!-- Popup -->
+    <div class="popup" id="welcomePopup">
+        <div class="popup-content">
+            <span class="close-popup" id="closePopup">&times;</span>
+            <h2>Welcome to TPINY X!</h2>
+            <p>Ready to improve your typing skills? Click the button below to start your typing journey!</p>
+            <button class="popup-button" id="popupStartBtn">Start Typing</button>
+        </div>
+    </div>
+    
+    <!-- Progress Modal -->
+    <div class="progress-modal" id="progressModal">
+        <div class="progress-modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <h2 style="margin-bottom: 1.5rem; color: #001f3f;">Your Typing Progress</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="modalAvgWpm">0</h3>
+                    <p>Average WPM</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="modalBestWpm">0</h3>
+                    <p>Best WPM</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="modalAvgAccuracy">0%</h3>
+                    <p>Average Accuracy</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="modalTotalTests">0</h3>
+                    <p>Tests Completed</p>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="modalProgressChart"></canvas>
+            </div>
+            
+            <h3 style="margin: 1.5rem 0 1rem; color: #001f3f;">Test History</h3>
+            <table class="history-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Duration</th>
+                        <th>WPM</th>
+                        <th>Accuracy</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody id="modalHistoryTableBody">
+                    <!-- History rows will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        // DOM Elements
+        const startTypingBtn = document.getElementById('startTypingBtn');
+        const welcomePopup = document.getElementById('welcomePopup');
+        const closePopup = document.getElementById('closePopup');
+        const popupStartBtn = document.getElementById('popupStartBtn');
+        const startButton = document.getElementById('startButton');
+        const resetButton = document.getElementById('resetButton');
+        const viewProgressBtn = document.getElementById('viewProgressBtn');
+        const progressLink = document.getElementById('progressLink');
+        const progressSection = document.getElementById('progressSection');
+        const typingInput = document.getElementById('typingInput');
+        const textDisplay = document.getElementById('textDisplay');
+        const timeDisplay = document.getElementById('time');
+        const wpmDisplay = document.getElementById('wpm');
+        const accuracyDisplay = document.getElementById('accuracy');
+        const timeOption = document.getElementById('timeOption');
+        const progressModal = document.getElementById('progressModal');
+        const closeModal = document.getElementById('closeModal');
+        const trackProgressCard = document.getElementById('trackProgressCard');
+        
+        // Game variables
+        let timer;
+        let timeLeft = 60;
+        let initialTime = 60;
+        let isPlaying = false;
+        let totalTyped = 0;
+        let correctTyped = 0;
+        let startTime;
+        
+        // Sample texts for typing
+        const texts = [
+            "The digital age has ushered in an era of unprecedented connectivity and information accessibility. From the vast reaches of the internet to the smallest microchips powering our devices, technology continues to reshape our lives at an astonishing pace. Smartphones, once a luxury, are now ubiquitous tools for communication, learning, and entertainment. These advancements, while offering immense benefits, also present challenges, such as the need to navigate the complexities of data privacy and the potential for digital addiction. As we move further into this technological landscape, striking a balance between embracing innovation and safeguarding our well-being becomes increasingly important for individuals and societies alike.",
+            "The vast blue ocean stretches towards the distant horizon, holding countless secrets within its depths. Waves gently lap against the shore, creating a soothing rhythm for all who listen. This endless expanse reminds us of the grandeur and mystery of the natural world.",
+            "Reading a good book transports you to another realm, where imagination takes flight and stories unfold. Characters become companions, and new perspectives begin to shape your understanding of the world. Embrace the joy of discovery that each turn of a page brings, enriching your mind and spirit.",
+            "Consistent typing practice is crucial for building speed and accuracy, laying a strong foundation for your skills. Focus on proper hand position and hitting the correct keys to develop muscle memory over time. Remember, accuracy trumps speed, so prioritize making fewer errors during your practice sessions",
+            "Consistent typing practice develops muscle memory, making the keyboard feel like an extension of your thoughts. This seamless connection allows for faster, more accurate writing, transforming your digital communication."
+        ];
+        
+        // Progress tracking
+        let typingHistory = JSON.parse(localStorage.getItem('typingHistory')) || [];
+        let progressChart;
+        let modalProgressChart;
+        
+        // Initialize event listeners when DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show welcome popup when page loads
+            setTimeout(() => {
+                welcomePopup.style.display = 'flex';
+            }, 1000);
+            
+            // Update progress stats if on progress page
+            if (window.location.hash === '#progress') {
+                showProgressSection();
+            }
+            
+            // Time option change event
+            timeOption.addEventListener('change', () => {
+                if (!isPlaying) {
+                    initialTime = parseInt(timeOption.value);
+                    timeLeft = initialTime;
+                    timeDisplay.textContent = timeLeft;
+                }
+            });
+            
+            // Popup event listeners
+            startTypingBtn.addEventListener('click', () => {
+                welcomePopup.style.display = 'flex';
+            });
+            
+            closePopup.addEventListener('click', () => {
+                welcomePopup.style.display = 'none';
+            });
+            
+            popupStartBtn.addEventListener('click', () => {
+                welcomePopup.style.display = 'none';
+                startGame();
+            });
+            
+            // Start game
+            startButton.addEventListener('click', startGame);
+            
+            // Reset game
+            resetButton.addEventListener('click', resetGame);
+            
+            // View progress
+            viewProgressBtn.addEventListener('click', () => {
+                showProgressModal();
+            });
+            
+            progressLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                showProgressSection();
+                window.location.hash = 'progress';
+            });
+            
+            // Track Progress Card click event
+            trackProgressCard.addEventListener('click', () => {
+                showProgressSection();
+                window.location.hash = 'progress';
+            });
+            
+            // Close modal
+            closeModal.addEventListener('click', () => {
+                progressModal.style.display = 'none';
+            });
+            
+            // Typing input event
+            typingInput.addEventListener('input', checkTyping);
+            
+            // Handle hash change for navigation
+            window.addEventListener('hashchange', () => {
+                if (window.location.hash === '#progress') {
+                    showProgressSection();
+                } else {
+                    progressSection.style.display = 'none';
+                }
+            });
+        });
+        
+        function startGame() {
+            resetGame();
+            isPlaying = true;
+            typingInput.disabled = false;
+            typingInput.focus();
+            startTime = new Date();
+            
+            // Get selected time
+            initialTime = parseInt(timeOption.value);
+            timeLeft = initialTime;
+            timeDisplay.textContent = timeLeft;
+            
+            // Disable time selector during game
+            timeOption.disabled = true;
+            
+            // Select random text
+            const randomIndex = Math.floor(Math.random() * texts.length);
+            textDisplay.textContent = texts[randomIndex];
+            
+            // Start timer
+            timer = setInterval(() => {
+                timeLeft--;
+                timeDisplay.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }, 1000);
+        }
+        
+        function resetGame() {
+            clearInterval(timer);
+            isPlaying = false;
+            initialTime = parseInt(timeOption.value);
+            timeLeft = initialTime;
+            totalTyped = 0;
+            correctTyped = 0;
+            timeDisplay.textContent = timeLeft;
+            wpmDisplay.textContent = '0';
+            accuracyDisplay.textContent = '0';
+            typingInput.value = '';
+            typingInput.disabled = true;
+            
+            // Enable time selector
+            timeOption.disabled = false;
+        }
+        
+        function endGame() {
+            clearInterval(timer);
+            isPlaying = false;
+            typingInput.disabled = true;
+            
+            // Enable time selector
+            timeOption.disabled = false;
+            
+            // Calculate final WPM and accuracy
+            const wordsTyped = totalTyped / 5; // Assuming 5 characters per word
+            const timeElapsed = (initialTime - timeLeft) / 60; // in minutes
+            const wpm = Math.round((wordsTyped / timeElapsed) || 0);
+            const accuracy = Math.round((correctTyped / totalTyped) * 100) || 0;
+            
+            wpmDisplay.textContent = wpm;
+            accuracyDisplay.textContent = accuracy;
+            
+            // Save result to history
+            saveResult(wpm, accuracy, initialTime);
+            
+            // Show completion message
+            showResultModal(wpm, accuracy);
+        }
+        
+        function checkTyping() {
+            if (!isPlaying) return;
+            
+            const typedText = typingInput.value;
+            const originalText = textDisplay.textContent;
+            
+            // Calculate WPM
+            totalTyped = typedText.length;
+            const wordsTyped = totalTyped / 5;
+            const timeElapsed = (initialTime - timeLeft) / 60; // in minutes
+            const wpm = Math.round((wordsTyped / timeElapsed) || 0);
+            wpmDisplay.textContent = wpm;
+            
+            // Calculate accuracy
+            let correctChars = 0;
+            for (let i = 0; i < typedText.length; i++) {
+                if (typedText[i] === originalText[i]) {
+                    correctChars++;
+                }
+            }
+            
+            correctTyped = correctChars;
+            const accuracy = Math.round((correctTyped / totalTyped) * 100) || 0;
+            accuracyDisplay.textContent = accuracy;
+            
+            // Check if completed
+            if (typedText === originalText) {
+                endGame();
+            }
+        }
+        
+        function saveResult(wpm, accuracy, duration) {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString();
+            const timeStr = now.toLocaleTimeString();
+            
+            const result = {
+                date: dateStr,
+                time: timeStr,
+                duration: duration,
+                wpm: wpm,
+                accuracy: accuracy,
+                timestamp: now.getTime()
+            };
+            
+            typingHistory.push(result);
+            
+            // Keep only the last 20 results
+            if (typingHistory.length > 20) {
+                typingHistory = typingHistory.slice(typingHistory.length - 20);
+            }
+            
+            localStorage.setItem('typingHistory', JSON.stringify(typingHistory));
+        }
+        
+        function showResultModal(wpm, accuracy) {
+            const resultModal = document.createElement('div');
+            resultModal.className = 'popup';
+            resultModal.style.display = 'flex';
+            
+            let improvement = '';
+            if (typingHistory.length > 1) {
+                const lastResult = typingHistory[typingHistory.length - 2];
+                const wpmChange = wpm - lastResult.wpm;
+                const accuracyChange = accuracy - lastResult.accuracy;
+                
+                improvement = `<p>Your WPM ${wpmChange >= 0 ? 'increased' : 'decreased'} by ${Math.abs(wpmChange)} and accuracy ${accuracyChange >= 0 ? 'increased' : 'decreased'} by ${Math.abs(accuracyChange)}% since last test.</p>`;
+            }
+            
+            const durationText = initialTime >= 60 ? 
+                `${initialTime / 60} minute${initialTime / 60 > 1 ? 's' : ''}` : 
+                `${initialTime} seconds`;
+            
+            resultModal.innerHTML = `
+                <div class="popup-content">
+                    <span class="close-popup" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                    <h2>Test Completed!</h2>
+                    <p>Duration: <strong>${durationText}</strong></p>
+                    <p>WPM: <strong>${wpm}</strong></p>
+                    <p>Accuracy: <strong>${accuracy}%</strong></p>
+                    ${improvement}
+                    <button class="popup-button" onclick="this.parentElement.parentElement.remove()">Continue</button>
+                </div>
+            `;
+            
+            document.body.appendChild(resultModal);
+        }
+        
+        function showProgressSection() {
+            progressSection.style.display = 'block';
+            updateProgressStats();
+            renderProgressChart();
+            renderHistoryTable();
+            
+            // Scroll to progress section
+            progressSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function showProgressModal() {
+            progressModal.style.display = 'block';
+            updateModalProgressStats();
+            renderModalProgressChart();
+            renderModalHistoryTable();
+        }
+        
+        function updateProgressStats() {
+            if (typingHistory.length === 0) {
+                document.getElementById('avgWpm').textContent = '0';
+                document.getElementById('bestWpm').textContent = '0';
+                document.getElementById('avgAccuracy').textContent = '0%';
+                document.getElementById('totalTests').textContent = '0';
+                return;
+            }
+            
+            const totalWpm = typingHistory.reduce((sum, result) => sum + result.wpm, 0);
+            const avgWpm = Math.round(totalWpm / typingHistory.length);
+            
+            const bestWpm = Math.max(...typingHistory.map(result => result.wpm));
+            
+            const totalAccuracy = typingHistory.reduce((sum, result) => sum + result.accuracy, 0);
+            const avgAccuracy = Math.round(totalAccuracy / typingHistory.length);
+            
+            document.getElementById('avgWpm').textContent = avgWpm;
+            document.getElementById('bestWpm').textContent = bestWpm;
+            document.getElementById('avgAccuracy').textContent = avgAccuracy + '%';
+            document.getElementById('totalTests').textContent = typingHistory.length;
+        }
+        
+        function updateModalProgressStats() {
+            if (typingHistory.length === 0) {
+                document.getElementById('modalAvgWpm').textContent = '0';
+                document.getElementById('modalBestWpm').textContent = '0';
+                document.getElementById('modalAvgAccuracy').textContent = '0%';
+                document.getElementById('modalTotalTests').textContent = '0';
+                return;
+            }
+            
+            const totalWpm = typingHistory.reduce((sum, result) => sum + result.wpm, 0);
+            const avgWpm = Math.round(totalWpm / typingHistory.length);
+            
+            const bestWpm = Math.max(...typingHistory.map(result => result.wpm));
+            
+            const totalAccuracy = typingHistory.reduce((sum, result) => sum + result.accuracy, 0);
+            const avgAccuracy = Math.round(totalAccuracy / typingHistory.length);
+            
+            document.getElementById('modalAvgWpm').textContent = avgWpm;
+            document.getElementById('modalBestWpm').textContent = bestWpm;
+            document.getElementById('modalAvgAccuracy').textContent = avgAccuracy + '%';
+            document.getElementById('modalTotalTests').textContent = typingHistory.length;
+        }
+        
+        function renderProgressChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (progressChart) {
+                progressChart.destroy();
+            }
+            
+            if (typingHistory.length === 0) {
+                ctx.font = '16px Arial';
+                ctx.fillStyle = '#666';
+                ctx.textAlign = 'center';
+                ctx.fillText('No data available. Complete some tests to see your progress.', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+            
+            const labels = typingHistory.map((_, index) => `Test ${index + 1}`);
+            const wpmData = typingHistory.map(result => result.wpm);
+            const accuracyData = typingHistory.map(result => result.accuracy);
+            
+            progressChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'WPM',
+                            data: wpmData,
+                            borderColor: '#0074D9',
+                            backgroundColor: 'rgba(0, 116, 217, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Accuracy %',
+                            data: accuracyData,
+                            borderColor: '#2ECC40',
+                            backgroundColor: 'rgba(46, 204, 64, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Your Typing Progress Over Time',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        function renderModalProgressChart() {
+            const ctx = document.getElementById('modalProgressChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (modalProgressChart) {
+                modalProgressChart.destroy();
+            }
+            
+            if (typingHistory.length === 0) {
+                ctx.font = '16px Arial';
+                ctx.fillStyle = '#666';
+                ctx.textAlign = 'center';
+                ctx.fillText('No data available. Complete some tests to see your progress.', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+            
+            const labels = typingHistory.map((_, index) => `Test ${index + 1}`);
+            const wpmData = typingHistory.map(result => result.wpm);
+            const accuracyData = typingHistory.map(result => result.accuracy);
+            
+            modalProgressChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'WPM',
+                            data: wpmData,
+                            borderColor: '#0074D9',
+                            backgroundColor: 'rgba(0, 116, 217, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Accuracy %',
+                            data: accuracyData,
+                            borderColor: '#2ECC40',
+                            backgroundColor: 'rgba(46, 204, 64, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Your Typing Progress Over Time',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        function renderHistoryTable() {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = '';
+            
+            if (typingHistory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No test history available</td></tr>';
+                return;
+            }
+            
+            // Sort by timestamp (newest first)
+            const sortedHistory = [...typingHistory].sort((a, b) => b.timestamp - a.timestamp);
+            
+            sortedHistory.forEach(result => {
+                const row = document.createElement('tr');
+                let durationText = '';
+                
+                if (result.duration >= 3600) {
+                    durationText = `${result.duration / 3600} hour${result.duration / 3600 > 1 ? 's' : ''}`;
+                } else if (result.duration >= 60) {
+                    durationText = `${result.duration / 60} minute${result.duration / 60 > 1 ? 's' : ''}`;
+                } else {
+                    durationText = `${result.duration} seconds`;
+                }
+                
+                row.innerHTML = `
+                    <td>${result.date} ${result.time}</td>
+                    <td>${durationText}</td>
+                    <td>${result.wpm}</td>
+                    <td>${result.accuracy}%</td>
+                    <td>${result.duration}s</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        function renderModalHistoryTable() {
+            const tbody = document.getElementById('modalHistoryTableBody');
+            tbody.innerHTML = '';
+            
+            if (typingHistory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No test history available</td></tr>';
+                return;
+            }
+            
+            // Sort by timestamp (newest first)
+            const sortedHistory = [...typingHistory].sort((a, b) => b.timestamp - a.timestamp);
+            
+            sortedHistory.forEach(result => {
+                const row = document.createElement('tr');
+                let durationText = '';
+                
+                if (result.duration >= 3600) {
+                    durationText = `${result.duration / 3600} hour${result.duration / 3600 > 1 ? 's' : ''}`;
+                } else if (result.duration >= 60) {
+                    durationText = `${result.duration / 60} minute${result.duration / 60 > 1 ? 's' : ''}`;
+                } else {
+                    durationText = `${result.duration} seconds`;
+                }
+                
+                row.innerHTML = `
+                    <td>${result.date} ${result.time}</td>
+                    <td>${durationText}</td>
+                    <td>${result.wpm}</td>
+                    <td>${result.accuracy}%</td>
+                    <td>${result.duration}s</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>
