@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Race Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(to bottom, #87CEEB, #2E8B57);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .game-container {
+            width: 90%;
+            max-width: 1000px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            position: relative;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            color: #FF4500;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 10px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .race-track {
+            position: relative;
+            height: 200px;
+            background: #555;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .lane {
+            position: absolute;
+            height: 50%;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+        
+        .lane-divider {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: repeating-linear-gradient(90deg, #fff, #fff 20px, transparent 20px, transparent 40px);
+            transform: translateY(-50%);
+        }
+        
+        .car {
+            position: absolute;
+            width: 80px;
+            height: 40px;
+            left: 20px;
+            transition: left 0.3s ease;
+        }
+        
+        .car-body {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        .player-car .car-body {
+            background: #3498db;
+        }
+        
+        .ai-car .car-body {
+            background: #e74c3c;
+        }
+        
+        .car-window {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            width: 20px;
+            height: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 5px;
+        }
+        
+        .car-wheel {
+            position: absolute;
+            bottom: -5px;
+            width: 15px;
+            height: 15px;
+            background: #333;
+            border-radius: 50%;
+        }
+        
+        .car-wheel.front {
+            left: 15px;
+        }
+        
+        .car-wheel.rear {
+            right: 15px;
+        }
+        
+        .word-display {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .word {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+            background: #f9f9f9;
+            padding: 15px 30px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .input-area {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .word-input {
+            width: 70%;
+            max-width: 500px;
+            padding: 15px;
+            font-size: 1.5rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .word-input:focus {
+            border-color: #3498db;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+        
+        .difficulty-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .difficulty-btn {
+            padding: 8px 15px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .difficulty-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            border-radius: 15px;
+            z-index: 10;
+            display: none;
+        }
+        
+        .game-over.show {
+            display: flex;
+        }
+        
+        .winner-text {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .final-stats {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .finish-line {
+            position: absolute;
+            right: 20px;
+            top: 0;
+            height: 100%;
+            width: 5px;
+            background: repeating-linear-gradient(0deg, #fff, #fff 10px, #000 10px, #000 20px);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1 class="title">Typing Race</h1>
+            <div class="difficulty-selector">
+                <div class="difficulty-btn active" data-level="easy">Easy</div>
+                <div class="difficulty-btn" data-level="medium">Medium</div>
+                <div class="difficulty-btn" data-level="hard">Hard</div>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="wpm">0</div>
+                <div class="stat-label">WPM</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="accuracy">100%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="progress">0%</div>
+                <div class="stat-label">Progress</div>
+            </div>
+        </div>
+        
+        <div class="race-track">
+            <div class="lane">
+                <div class="car player-car">
+                    <div class="car-body">
+                        <div class="car-window"></div>
+                        <div class="car-wheel front"></div>
+                        <div class="car-wheel rear"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="lane-divider"></div>
+            <div class="lane">
+                <div class="car ai-car">
+                    <div class="car-body">
+                        <div class="car-window"></div>
+                        <div class="car-wheel front"></div>
+                        <div class="car-wheel rear"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="finish-line"></div>
+        </div>
+        
+        <div class="word-display">
+            <div class="word" id="current-word">Loading...</div>
+        </div>
+        
+        <div class="input-area">
+            <input type="text" class="word-input" id="word-input" placeholder="Type the word here..." autocomplete="off">
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-primary" id="start-btn">Start Race</button>
+            <button class="btn btn-secondary" id="reset-btn">Reset</button>
+        </div>
+        
+        <div class="game-over" id="game-over">
+            <div class="winner-text" id="winner-text">You Win!</div>
+            <div class="final-stats" id="final-stats">
+                <p>Time: <span id="final-time">0</span> seconds</p>
+                <p>Words Typed: <span id="final-words">0</span></p>
+                <p>Speed: <span id="final-wpm">0</span> WPM</p>
+            </div>
+            <button class="btn btn-primary" id="play-again-btn">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Game elements
+            const wordDisplay = document.getElementById('current-word');
+            const wordInput = document.getElementById('word-input');
+            const startBtn = document.getElementById('start-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const playAgainBtn = document.getElementById('play-again-btn');
+            const gameOverScreen = document.getElementById('game-over');
+            const winnerText = document.getElementById('winner-text');
+            const finalTime = document.getElementById('final-time');
+            const finalWords = document.getElementById('final-words');
+            const finalWpm = document.getElementById('final-wpm');
+            const playerCar = document.querySelector('.player-car');
+            const aiCar = document.querySelector('.ai-car');
+            const wpmDisplay = document.getElementById('wpm');
+            const accuracyDisplay = document.getElementById('accuracy');
+            const progressDisplay = document.getElementById('progress');
+            const difficultyBtns = document.querySelectorAll('.difficulty-btn');
+            
+            // Game variables
+            let currentWord = '';
+            let wordsTyped = 0;
+            let correctWords = 0;
+            let startTime = null;
+            let gameActive = false;
+            let playerProgress = 0;
+            let aiProgress = 0;
+            let aiInterval = null;
+            let difficulty = 'easy';
+            
+            // Word lists
+            const wordLists = {
+                easy: ["cat", "dog", "sun", "moon", "tree", "book", "water", "house", "food", "time"],
+                medium: ["computer", "keyboard", "elephant", "butterfly", "mountain", "rainbow", "adventure", "chocolate", "universe", "friendship"],
+                hard: ["synchronize", "magnificent", "encyclopedia", "extraordinary", "revolutionary", "metamorphosis", "accomplishment", "responsibility", "entrepreneur", "curiosity"]
+            };
+            
+            // Initialize game
+            function initGame() {
+                currentWord = getRandomWord();
+                wordDisplay.textContent = currentWord;
+                wordInput.value = '';
+                wordsTyped = 0;
+                correctWords = 0;
+                playerProgress = 0;
+                aiProgress = 0;
+                updateCarPositions();
+                updateStats();
+                gameOverScreen.classList.remove('show');
+            }
+            
+            // Get random word based on difficulty
+            function getRandomWord() {
+                const words = wordLists[difficulty];
+                return words[Math.floor(Math.random() * words.length)];
+            }
+            
+            // Update car positions based on progress
+            function updateCarPositions() {
+                const trackWidth = document.querySelector('.race-track').offsetWidth - 120; // Subtract car width and margins
+                playerCar.style.left = `${20 + (trackWidth * playerProgress / 100)}px`;
+                aiCar.style.left = `${20 + (trackWidth * aiProgress / 100)}px`;
+            }
+            
+            // Update stats display
+            function updateStats() {
+                // Calculate WPM
+                if (startTime) {
+                    const elapsedTime = (Date.now() - startTime) / 1000 / 60; // in minutes
+                    const wpm = Math.round(wordsTyped / 5 / elapsedTime);
+                    wpmDisplay.textContent = wpm;
+                }
+                
+                // Calculate accuracy
+                const accuracy = wordsTyped > 0 ? Math.round((correctWords / wordsTyped) * 100) : 100;
+                accuracyDisplay.textContent = `${accuracy}%`;
+                
+                // Update progress
+                progressDisplay.textContent = `${Math.round(playerProgress)}%`;
+            }
+            
+            // Start the game
+            function startGame() {
+                if (gameActive) return;
+                
+                gameActive = true;
+                startTime = Date.now();
+                wordInput.focus();
+                
+                // Start AI movement
+                aiInterval = setInterval(() => {
+                    if (gameActive) {
+                        // AI progresses at random speed based on difficulty
+                        let speed;
+                        if (difficulty === 'easy') {
+                            speed = Math.random() * 0.5 + 0.3; // 0.3-0.8%
+                        } else if (difficulty === 'medium') {
+                            speed = Math.random() * 0.7 + 0.5; // 0.5-1.2%
+                        } else {
+                            speed = Math.random() * 0.9 + 0.7; // 0.7-1.6%
+                        }
+                        
+                        aiProgress += speed;
+                        if (aiProgress > 100) aiProgress = 100;
+                        updateCarPositions();
+                        
+                        // Check if AI won
+                        if (aiProgress >= 100) {
+                            endGame(false);
+                        }
+                    }
+                }, 100);
+            }
+            
+            // End the game
+            function endGame(playerWon) {
+                gameActive = false;
+                clearInterval(aiInterval);
+                
+                const elapsedTime = (Date.now() - startTime) / 1000;
+                const wpm = Math.round(wordsTyped / 5 / (elapsedTime / 60));
+                
+                winnerText.textContent = playerWon ? 'You Win!' : 'AI Wins!';
+                finalTime.textContent = elapsedTime.toFixed(1);
+                finalWords.textContent = wordsTyped;
+                finalWpm.textContent = wpm;
+                
+                gameOverScreen.classList.add('show');
+            }
+            
+            // Handle word input
+            wordInput.addEventListener('input', () => {
+                if (!gameActive) return;
+                
+                const typedWord = wordInput.value.trim();
+                
+                if (typedWord === currentWord) {
+                    // Correct word typed
+                    wordsTyped++;
+                    correctWords++;
+                    
+                    // Increase player progress
+                    playerProgress += 10;
+                    if (playerProgress > 100) playerProgress = 100;
+                    updateCarPositions();
+                    
+                    // Get new word
+                    currentWord = getRandomWord();
+                    wordDisplay.textContent = currentWord;
+                    wordInput.value = '';
+                    
+                    // Update stats
+                    updateStats();
+                    
+                    // Check if player won
+                    if (playerProgress >= 100) {
+                        endGame(true);
+                    }
+                }
+            });
+            
+            // Handle Enter key
+            wordInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !gameActive) {
+                    startGame();
+                }
+            });
+            
+            // Start button
+            startBtn.addEventListener('click', startGame);
+            
+            // Reset button
+            resetBtn.addEventListener('click', () => {
+                gameActive = false;
+                clearInterval(aiInterval);
+                initGame();
+            });
+            
+            // Play again button
+            playAgainBtn.addEventListener('click', () => {
+                initGame();
+                startGame();
+            });
+            
+            // Difficulty selection
+            difficultyBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    difficultyBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    difficulty = btn.dataset.level;
+                    if (!gameActive) {
+                        initGame();
+                    }
+                });
+            });
+            
+            // Initialize game on load
+            initGame();
+        });
+    </script>
+</body>
+</html>
