@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Word Sniper</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-color, linear-gradient(to bottom right, #c3e0f3, #f9fbfd));
+      background-size: cover;
+      color: #1e1e2f;
+      transition: background 0.5s ease;
+    }
+    #game-container {
+      width: 100%;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .falling-word {
+      position: absolute;
+      font-size: 24px;
+      color: #1f77b4;
+      animation: fall linear;
+    }
+    #game-title {
+      font-size: 48px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #1e3a8a;
+    }
+    .button {
+      padding: 10px 20px;
+      margin: 5px;
+      background-color: #3b82f6;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: transform 0.2s ease, background 0.3s;
+    }
+    .button:hover {
+      background-color: #2563eb;
+      transform: scale(1.05);
+    }
+    .selected {
+      border: 2px solid #10b981;
+    }
+    #word-input {
+      padding: 10px;
+      font-size: 18px;
+      border: 2px solid #3b82f6;
+      border-radius: 8px;
+      background-color: #f8fafc;
+      color: #1e1e2f;
+      width: 250px;
+    }
+    #game-ui {
+      position: absolute;
+      top: 100px;
+      right: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .ui-element {
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 10px 16px;
+      border-radius: 10px;
+      min-width: 160px;
+      text-align: center;
+      color: #1e3a8a;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    #start-screen { background-color: rgba(255, 255, 255, 0.95); }
+    #end-screen {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(255, 255, 255, 0.95);
+      z-index: 10;
+    }
+    #end-title {
+      font-size: 36px;
+      margin-bottom: 10px;
+      color: #1e3a8a;
+    }
+    #theme-container {
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <div id="start-screen">
+      <div id="game-title">Word Sniper</div>
+      <div id="difficulty-container">
+        <button class="button" onclick="setDifficulty('easy')">Easy</button>
+        <button class="button selected" onclick="setDifficulty('medium')">Medium</button>
+        <button class="button" onclick="setDifficulty('hard')">Hard</button>
+      </div>
+      <div id="time-container">
+        <button class="button" onclick="setTime(60)">1 Minute</button>
+        <button class="button" onclick="setTime(300)">5 Minutes</button>
+        <button class="button" onclick="setTime(600)">10 Minutes</button>
+      </div>
+      <div id="theme-container">
+        <button class="button" onclick="setTheme('light')">Light Theme</button>
+        <button class="button" onclick="setTheme('dark')">Dark Theme</button>
+        <button class="button" onclick="setTheme('image')">Image Background</button>
+      </div>
+      <button class="button" onclick="startGame()">Start Game</button>
+    </div>
+
+    <div id="game-ui">
+      <div class="ui-element" id="score-display">Score: 0</div>
+      <div class="ui-element" id="time-display">Time: 60</div>
+      <div class="ui-element" id="high-score">High Score: 0</div>
+      <div class="ui-element" id="accuracy-display">Accuracy: 0%</div>
+    </div>
+
+    <div id="input-container">
+      <input id="word-input" type="text" placeholder="Type word here..." oninput="checkInput()" />
+    </div>
+
+    <div id="end-screen" style="display:none">
+      <div id="end-title">Game Over!</div>
+      <div id="final-score">Score: 0</div>
+      <button class="button" onclick="restartGame()">Restart</button>
+    </div>
+  </div>
+
+  <script>
+    const wordLists = {
+      easy: ["cat", "dog", "pen", "cup", "sun", "bat", "top", "map", "bag", "fan", "box", "red", "run", "toy", "man", "cap", "log", "net", "sit", "cow"],
+      medium: ["apple", "banana", "grape", "cherry", "orange", "melon", "school", "market", "father", "mother", "laptop", "pencil", "doctor", "travel", "ticket", "pillow", "animal", "planet", "garden", "bottle"],
+      hard: ["avocado", "pineapple", "strawberry", "blueberry", "watermelon", "mountain", "adventure", "symphony", "keyboard", "airplane", "triangle", "elephant", "mechanism", "university", "beautiful", "education", "restaurant", "photograph", "telescope", "chemistry"]
+    };
+    let score = 0, time = 60, timer, interval, difficulty = "medium", wordSpeed = 2000;
+    let totalTyped = 0, correctTyped = 0;
+
+    function setDifficulty(level) {
+      difficulty = level;
+      document.querySelectorAll("#difficulty-container .button").forEach(btn => btn.classList.remove("selected"));
+      event.target.classList.add("selected");
+    }
+
+    function setTime(t) {
+      time = t;
+      document.querySelectorAll("#time-container .button").forEach(btn => btn.classList.remove("selected"));
+      event.target.classList.add("selected");
+    }
+
+    function setTheme(theme) {
+      if (theme === 'light') {
+        document.body.style.setProperty('--bg-color', 'linear-gradient(to bottom right, #c3e0f3, #f9fbfd)');
+      } else if (theme === 'dark') {
+        document.body.style.setProperty('--bg-color', 'linear-gradient(to bottom right, #1e1e2f, #2d2d44)');
+      } else if (theme === 'image') {
+        document.body.style.setProperty('--bg-color', 'url("https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=80") center/cover no-repeat');
+      }
+    }
+
+    function startGame() {
+      document.getElementById("start-screen").style.display = "none";
+      document.getElementById("end-screen").style.display = "none";
+      document.getElementById("word-input").focus();
+      score = totalTyped = correctTyped = 0;
+      updateScore(); updateTime(); updateAccuracy();
+
+      switch (difficulty) {
+        case "easy": wordSpeed = 3000; break;
+        case "medium": wordSpeed = 2000; break;
+        case "hard": wordSpeed = 1000; break;
+      }
+
+      timer = setInterval(() => {
+        time--;
+        updateTime();
+        if (time <= 0) endGame();
+      }, 1000);
+
+      interval = setInterval(spawnWord, wordSpeed);
+    }
+
+    function spawnWord() {
+      const word = wordLists[difficulty][Math.floor(Math.random() * wordLists[difficulty].length)];
+      const wordEl = document.createElement("div");
+      wordEl.className = "falling-word";
+      wordEl.innerText = word;
+      wordEl.style.left = Math.random() * 90 + "%";
+      wordEl.style.top = "0";
+      document.getElementById("game-container").appendChild(wordEl);
+      animateWord(wordEl);
+    }
+
+    function animateWord(el) {
+      let pos = 0;
+      const move = setInterval(() => {
+        pos++;
+        el.style.top = pos + "px";
+        if (pos > window.innerHeight) {
+          el.remove();
+          clearInterval(move);
+        }
+      }, 16);
+    }
+
+    function checkInput() {
+      const input = document.getElementById("word-input").value.trim();
+      const wordsOnScreen = document.querySelectorAll(".falling-word");
+      totalTyped++;
+      wordsOnScreen.forEach(wordEl => {
+        if (wordEl.innerText === input) {
+          score++;
+          correctTyped++;
+          updateScore();
+          wordEl.remove();
+          document.getElementById("word-input").value = "";
+        }
+      });
+      updateAccuracy();
+    }
+
+    function updateScore() {
+      document.getElementById("score-display").innerText = `Score: ${score}`;
+    }
+    function updateTime() {
+      document.getElementById("time-display").innerText = `Time: ${time}`;
+    }
+    function updateAccuracy() {
+      let accuracy = totalTyped > 0 ? Math.round((correctTyped / totalTyped) * 100) : 0;
+      document.getElementById("accuracy-display").innerText = `Accuracy: ${accuracy}%`;
+    }
+
+    function endGame() {
+      clearInterval(timer); clearInterval(interval);
+      document.getElementById("final-score").innerText = `Score: ${score}`;
+      const storedHighScore = localStorage.getItem("highscore") || 0;
+      if (score > storedHighScore) {
+        localStorage.setItem("highscore", score);
+      }
+      document.getElementById("high-score").innerText = `High Score: ${Math.max(score, storedHighScore)}`;
+      setTimeout(() => {
+        document.getElementById("end-screen").style.display = "flex";
+      }, 300);
+    }
+
+    function restartGame() {
+      document.getElementById("end-screen").style.display = "none";
+      document.getElementById("start-screen").style.display = "flex";
+      document.querySelectorAll(".falling-word").forEach(el => el.remove());
+      document.getElementById("word-input").value = "";
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const storedHighScore = localStorage.getItem("highscore") || 0;
+      document.getElementById("high-score").innerText = `High Score: ${storedHighScore}`;
+    });
+  </script>
+</body>
+</html>
